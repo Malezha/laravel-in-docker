@@ -32,6 +32,9 @@ init: ## Make full application initialization
 ssh: ## Start shell into app container
 	docker-compose run $(DC_RUN_ARGS) app sh
 
+node: ## Start shell into node container
+	docker-compose run $(DC_RUN_ARGS) node sh
+
 test: ## Execute app tests
 	docker-compose run $(DC_RUN_ARGS) app composer test
 
