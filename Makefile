@@ -2,6 +2,7 @@
 
 SHELL = /bin/sh
 DC_RUN_ARGS = --rm --user "$(shell id -u):$(shell id -g)"
+CURRENT_USER = APP_UID=$(shell id -u) APP_GID=$(shell id -g)
 FRONTEND_CONTAINER = node # remove for disable frontend build
 
 .PHONY : help install composer-install npm-install dependencies-install ssh init test start stop restart
@@ -39,11 +40,11 @@ test: ## Execute app tests
 	docker-compose run $(DC_RUN_ARGS) app composer test
 
 build: ## Build php images
-	APP_UID=$(shell id -u) APP_GID=$(shell id -g) docker-compose build app nginx ${FRONTEND_CONTAINER}
-	APP_UID=$(shell id -u) APP_GID=$(shell id -g) docker-compose build web queue cron
+	$(CURRENT_USER) docker-compose build app nginx ${FRONTEND_CONTAINER}
+	$(CURRENT_USER) docker-compose build web queue cron
 
 start: ## Create and start containers
-	APP_UID=$(shell id -u) APP_GID=$(shell id -g) docker-compose up --detach --remove-orphans nginx web queue cron ${FRONTEND_CONTAINER}
+	docker-compose up --detach --remove-orphans nginx web queue cron ${FRONTEND_CONTAINER}
 	@printf "\n   \e[30;42m %s \033[0m\n\n" 'Navigate your browser to ⇒ https://localhost';
 
 stop: ## Stop containers

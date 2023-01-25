@@ -1,7 +1,6 @@
 version: '3.8'
 
 volumes:
-  tmp-data:
   mysql-data:
   redis-data:
 
@@ -12,14 +11,12 @@ services:
       dockerfile: docker/php/Dockerfile
       args:
         PHP_VERSION: 8.1
-    user: '${APP_UID:-10001}:${APP_GID:-10001}'
+        APP_UID: ${APP_UID:-10001}
+        APP_GID: ${APP_GID:-10001}
     environment:
       PS1: '\[\033[1;32m\]\[\033[1;36m\][\u@\h] \[\033[1;34m\]\w\[\033[0;35m\] \[\033[1;36m\]# \[\033[0m\]'
       HOME: /tmp
     volumes:
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
-      - tmp-data:/tmp:rw
       - .:/app:rw
       - ./docker/php/custom-php.ini:/usr/local/etc/php/conf.d/custom-php.ini:ro
       - ./docker/php/custom-fpm.conf:/usr/local/etc/php-fpm.d/custom-fpm.conf:ro
@@ -81,12 +78,11 @@ services:
       dockerfile: docker/node/Dockerfile
       args:
         NODE_VERSION: 16
-    user: '${APP_UID:-10001}:${APP_GID:-10001}'
+        APP_UID: ${APP_UID:-10001}
+        APP_GID: ${APP_GID:-10001}
     ports:
       - '5173:5173/tcp'
     volumes:
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
       - .:/app:rw
     command: npm run dev
 

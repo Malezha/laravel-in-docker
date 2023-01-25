@@ -68,16 +68,28 @@ RUN set -x \
         https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
     && chmod +x /usr/local/bin/php-fpm-healthcheck \
     # show installed PHP modules
-    && php -m \
+    && php -m
+
+ARG APP_UID=10001
+ARG APP_GID=10001
+
+RUN set -x \
+    # delete exists user ang group with selected UID and GID
+    && if getent passwd ${APP_UID} &> /dev/null; then deluser --remove-home $(getent passwd ${APP_UID} | cut -d: -f1); fi \
+    && if getent group ${APP_GID} &> /dev/null; then delgroup $(getent group ${APP_GID} | cut -d: -f1); fi \
     # create unprivileged user
+    && addgroup \
+        --gid ${APP_GID}  \
+        appuser \
     && adduser \
         --disabled-password \
         --shell "/sbin/nologin" \
         --home "/nonexistent" \
         --no-create-home \
-        --uid "10001" \
+        --uid ${APP_UID} \
         --gecos "" \
-        "appuser" \
+        -G appuser \
+        appuser \
     # create directory for application sources
     && mkdir /app \
     && chown -R appuser:appuser /app
