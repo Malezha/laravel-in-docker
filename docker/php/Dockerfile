@@ -48,6 +48,7 @@ RUN set -x \
         #pdo_pgsql \
         #imap \
         1>/dev/null \
+    # redis
     && pecl install -o redis 1>/dev/null \
     && echo 'extension=redis.so' > ${PHP_INI_DIR}/conf.d/redis.ini \
     # install supercronic (for laravel task scheduling), project page: <https://github.com/aptible/supercronic>
@@ -56,6 +57,9 @@ RUN set -x \
     && chmod +x /usr/bin/supercronic \
     && mkdir /etc/supercronic \
     && echo '*/1 * * * * php /app/artisan schedule:run' > /etc/supercronic/laravel \
+    && pecl install -o xdebug 1>/dev/null \
+    && echo -e "#zend_extension=xdebug\n\n[xdebug]\nxdebug.mode=develop,debug\nxdebug.client_host=host.docker.internal\nxdebug.start_with_request=yes" >> \
+            ${PHP_INI_DIR}/conf.d/xdebug.ini \
     # make clean up
     && docker-php-source delete \
     && apk del .build-deps \

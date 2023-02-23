@@ -10,7 +10,7 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile
       args:
-        PHP_VERSION: 8.1
+        PHP_VERSION: 8.2
         APP_UID: ${APP_UID:-10001}
         APP_GID: ${APP_GID:-10001}
     environment:
@@ -62,7 +62,7 @@ services:
       retries: 10
 
   redis:
-    image: redis:7-alpine
+    image: redis:alpine
     volumes:
       - redis-data:/data:rw
     ports:
@@ -77,7 +77,7 @@ services:
       context: .
       dockerfile: docker/node/Dockerfile
       args:
-        NODE_VERSION: 16
+        NODE_VERSION: 18
         APP_UID: ${APP_UID:-10001}
         APP_GID: ${APP_GID:-10001}
     ports:

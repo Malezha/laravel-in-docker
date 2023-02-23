@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.2
 
 ARG NODE_VERSION=lts
-ARG NPM_VERSION=9.3.1
+ARG NPM_VERSION=latest
 
 FROM node:${NODE_VERSION}-alpine
 
