@@ -16,10 +16,12 @@ services:
     environment:
       PS1: '\[\033[1;32m\]\[\033[1;36m\][\u@\h] \[\033[1;34m\]\w\[\033[0;35m\] \[\033[1;36m\]# \[\033[0m\]'
       HOME: /tmp
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-serverName=local}
     volumes:
       - .:/app:rw
       - ./docker/php/custom-php.ini:/usr/local/etc/php/conf.d/custom-php.ini:ro
       - ./docker/php/custom-fpm.conf:/usr/local/etc/php-fpm.d/custom-fpm.conf:ro
+      - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini:ro
     depends_on:
       mysql: { condition: service_healthy }
       redis: { condition: service_healthy }
