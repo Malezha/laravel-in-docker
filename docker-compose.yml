@@ -1,6 +1,7 @@
 version: '3.8'
 
 volumes:
+  home-data:
   mysql-data:
   redis-data:
 
@@ -18,6 +19,7 @@ services:
       HOME: /tmp
       PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-serverName=local}
     volumes:
+      - home-data:/home/appuser
       - .:/app:rw
       - ./docker/php/custom-php.ini:/usr/local/etc/php/conf.d/custom-php.ini:ro
       - ./docker/php/custom-fpm.conf:/usr/local/etc/php-fpm.d/custom-fpm.conf:ro
@@ -85,6 +87,7 @@ services:
     ports:
       - '5173:5173/tcp'
     volumes:
+      - home-data:/home/appuser
       - .:/app:rw
     command: npm run dev
 

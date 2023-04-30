@@ -45,6 +45,7 @@ RUN set -x \
         gd \
         intl \
         zip \
+        exif \
         #pdo_pgsql \
         #imap \
         1>/dev/null \
@@ -52,7 +53,7 @@ RUN set -x \
     && pecl install -o redis 1>/dev/null \
     && echo 'extension=redis.so' > ${PHP_INI_DIR}/conf.d/redis.ini \
     # install supercronic (for laravel task scheduling), project page: <https://github.com/aptible/supercronic>
-    && wget -q "https://github.com/aptible/supercronic/releases/download/v0.2.1/supercronic-linux-amd64" \
+    && wget -q "https://github.com/aptible/supercronic/releases/download/v0.2.2/supercronic-linux-amd64" \
          -O /usr/bin/supercronic \
     && chmod +x /usr/bin/supercronic \
     && mkdir /etc/supercronic \
@@ -72,6 +73,9 @@ RUN set -x \
     && chmod +x /usr/local/bin/php-fpm-healthcheck \
     # show installed PHP modules
     && php -m
+
+# install composer, image page: <https://hub.docker.com/_/composer>
+COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 ARG APP_UID=10001
 ARG APP_GID=10001
@@ -97,32 +101,11 @@ RUN set -x \
     && mkdir /app \
     && chown -R appuser:appuser /app
 
-# install composer, image page: <https://hub.docker.com/_/composer>
-COPY --from=composer /usr/bin/composer /usr/bin/composer
-ENV COMPOSER_HOME="/tmp/composer"
-
 # use an unprivileged user by default
 USER appuser:appuser
 
 # use directory with application sources by default
 WORKDIR /app
-
-# copy composer (json|lock) files for dependencies layer caching
-COPY --chown=appuser:appuser ./composer.* /app/
-
-# install composer dependencies (autoloader MUST be generated later!)
-RUN composer install -n --no-dev --no-cache --no-ansi --no-autoloader --no-scripts --prefer-dist
-
-# copy application sources into image (completely)
-COPY --chown=appuser:appuser . /app/
-
-RUN set -x \
-    # generate composer autoloader and trigger scripts
-    && composer dump-autoload -n --optimize \
-    # "fix" composer issue "Cannot create cache directory /tmp/composer/cache/..." for docker-compose usage
-    && chmod -R 777 ${COMPOSER_HOME}/cache \
-    # create the symbolic links configured for the application
-    && php ./artisan storage:link
 
 # unset default image entrypoint
 ENTRYPOINT []
